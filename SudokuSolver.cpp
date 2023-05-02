@@ -25,42 +25,53 @@ SudokuSolver::SudokuSolver()
 
 SudokuSolver::SudokuSolver(std::string input_file)
 {
-    std::ifstream sudoku_board(input_file);
-    if(sudoku_board.fail())
-    {
-        std::cout << "File cannot be opened for reading \n";
-        exit(1);//exit if file cannot be opened
-    }
-    
     puzzle_numbers_ = new int*[9];
     for(int row = 0; row < 9; row++)
     {
         puzzle_numbers_[row] = new int[9];
     }
+
+    std::ifstream sudoku_board(input_file);
+    if(!sudoku_board.is_open())
+    {
+        std::cerr << "Failed to open file " << input_file << std::endl; exit(1);
+    }
+    int** arr = new int*[9];
+    for(int i = 0; i < 9; i++)
+    {
+        arr[i] = new int[9];
+    }
     std::string temp_line_reader; //holds the values that will be read from the file
-    int board_num; //used for stringstream to convert string to int
-    Sudoku::Location location;//used to store row/col val
-    while(!sudoku_board.eof())
+    if(sudoku_board.is_open())
     {
         for(int row = 0; row = 9; row++)
         {
+            std::getline(sudoku_board, temp_line_reader);
+            std::stringstream iss(temp_line_reader);
             for(int col = 0; col = 9; col++)
             {
-                location.row = row;
-                location.col = col;
-                getline(sudoku_board, temp_line_reader, ',');
-                std::stringstream int_num_hold;
-                int_num_hold << temp_line_reader;
-                int_num_hold >> board_num;
-                if(checkLegalValue(board_num, location))
-                {
-                    //puzzle_numbers_[row][col] = board_num;
-                    continue;
-                }
+                std::string line;
+                std::getline(iss, line, ',');
+                std::stringstream board_num(line);//used for stringstream to convert string to int
+                board_num >> arr[row][col];
             }
         }
     }
-    puzzle_solvability_ = true; 
+    else
+    {
+        puzzle_solvability_ = false;
+    }
+    for(int i = 0; i < 9; i++)
+    {
+        for(int j = 0; j < 9; j++)
+        {
+            puzzle_numbers_[i][j] = arr[i][j];
+        }
+    }
+    if(SudokuSolution())
+    {
+        puzzle_solvability_ = true; 
+    }
 }
 
 bool SudokuSolver::isPuzzleSolvable()
@@ -102,48 +113,39 @@ Sudoku::Location SudokuSolver::returnNextEmpty()
     return zero_finder;
 }
 
-bool SudokuSolver::IsPresentInCol(int col, int value)
+bool SudokuSolver::checkLegalValue(int value, Sudoku::Location location)
 {
     for(int row = 0; row < 9; row++)
     {
-        if(puzzle_numbers_[row][col] == value)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool SudokuSolver::IsPresentInRow(int row, int value)
-{
-    for(int col = 0; col < 9; col++)
-    {
-        if(puzzle_numbers_[row][col] == value)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool SudokuSolver::IsPresentInSubgrid(int subgrid_row, int subgrid_col, int value)
-{
-    for(int row = 0; row < 3; row++)
-    {
-        for(int col = 0; col < 3; col++)
-        {
-            if(puzzle_numbers_[row + subgrid_row][col + subgrid_col] == value)
+        if(row != location.row){
+            if(puzzle_numbers_[row][location.col] == value)
             {
-                return true;
+                return false;
             }
         }
     }
-  return false;
-}
-
-bool SudokuSolver::checkLegalValue(int value, Sudoku::Location location)
-{
-    return !IsPresentInRow(location.row, value) && !IsPresentInCol(location.col, value) && !IsPresentInSubgrid(location.row - location.row % 3, location.col - location.col % 3, value);//checks to see if value is in any of the rows, cols and 3x3 subgrids. If it is found, return false, else true.
+    for(int col = 0; col < 9; col++)
+    {
+        if(col != location.col){
+            if(puzzle_numbers_[location.row][col] == value)
+            {
+                return false;
+            }
+        }
+    }
+    int start_row = (location.row / 3) * 3;
+    int start_col = (location.col / 3) * 3;
+    for(int row = start_row; row < start_row + 3; row++)
+    {
+        for(int col = start_col; col < start_col + 3; col++)
+        {
+            if(puzzle_numbers_[row][col] == value)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void SudokuSolver::display()
