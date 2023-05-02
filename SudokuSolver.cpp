@@ -94,7 +94,7 @@ void SudokuSolver::setPuzzleNumbers(int** puzzle)
     puzzle_numbers_ = puzzle;
 }
 
-Sudoku::Location SudokuSolver::returnNextEmpty()
+Sudoku::Location SudokuSolver::returnNextEmpty() const
 {
     Sudoku::Location zero_finder;
     zero_finder.row = -1;
@@ -107,6 +107,7 @@ Sudoku::Location SudokuSolver::returnNextEmpty()
             {
                 zero_finder.row = i;
                 zero_finder.col = j;
+                return zero_finder;
             }
         }
     }
