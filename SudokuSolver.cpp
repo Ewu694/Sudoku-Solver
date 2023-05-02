@@ -26,52 +26,41 @@ SudokuSolver::SudokuSolver()
 SudokuSolver::SudokuSolver(std::string input_file)
 {
     puzzle_numbers_ = new int*[9];
-    for(int row = 0; row < 9; row++)
-    {
-        puzzle_numbers_[row] = new int[9];
-    }
-
-    std::ifstream sudoku_board(input_file);
-    if(!sudoku_board.is_open())
-    {
-        std::cerr << "Failed to open file " << input_file << std::endl; exit(1);
-    }
-    int** arr = new int*[9];
-    for(int i = 0; i < 9; i++)
-    {
-        arr[i] = new int[9];
-    }
-    std::string temp_line_reader; //holds the values that will be read from the file
-    /*if(sudoku_board.is_open())
-    {
-        for(int row = 0; row = 9; row++)
+    for (int i = 0; i < 9; i++) 
         {
-            getline(sudoku_board, temp_line_reader);
-            std::stringstream iss(temp_line_reader);
-            for(int col = 0; col = 9; col++)
+          puzzle_numbers_[i] = new int[9];
+        }
+    std::ifstream sudokuboard(input_file);
+
+        // returns error if file wasn't successfully opened
+        if (!sudokuboard.is_open()) 
+        {
+            std::cerr << "Failed to open file " << input_file << std::endl;
+            exit(1);
+        }
+        std::string temp_reader;
+        // read the file using a nested loop
+        if(sudokuboard.is_open())
+        {
+            for(int row = 0; row < 9; row++)
             {
-                std::string line;
-                getline(iss, line, ',');
-                std::stringstream board_num(line);//used for stringstream to convert string to int
-                board_num >> arr[row][col];
+                std::getline(sudokuboard,temp_reader);
+                std::stringstream iss(temp_reader);
+                for(int col = 0;col < 9;col++)
+                {
+                    std::string line;
+                    std::getline(iss,line,',');
+                    std::stringstream num(line);
+                    num >> puzzle_numbers_[row][col];
+                }
             }
         }
-    }
-    for(int i = 0; i < 9; i++)
-    {
-        for(int j = 0; j < 9; j++)
+        else
         {
-            puzzle_numbers_[i][j] = arr[i][j];
+            puzzle_solvability_ = false;
         }
-    }
-    if(SudokuSolution())
-    {
-        puzzle_solvability_ = true; 
-    }
-    else
-    {
-        puzzle_solvability_ = false;
-    }*/
+
+    SudokuSolution();
 }
 
 bool SudokuSolver::isPuzzleSolvable()
@@ -182,22 +171,25 @@ void SudokuSolver::display()
 
 bool SudokuSolver::SudokuSolution()
 {
-    Sudoku::Location location;
-    if(puzzle_numbers_[returnNextEmpty().row][returnNextEmpty().col] != 0)
-    {
-        return true;//solved because unable to find a empty square
-    }
+    Sudoku::Location empty = returnNextEmpty();
+    if(empty.row == -1 && empty.col == -1)
+        return true;
     for(int i = 1; i <= 9; i++)
-    {
-        if(checkLegalValue(i, location))
+    {   
+        if(checkLegalValue(i, empty))
         {
-            puzzle_numbers_[location.row][location.col] = i;
-        }
+            puzzle_numbers_[empty.row][empty.col] = i;
             if(SudokuSolution())
             {
+                puzzle_solvability_ = true;
                 return true;
             }
-            puzzle_numbers_[location.row][location.col] = 0;
+            else
+            {
+                puzzle_solvability_ = false;
+                puzzle_numbers_[empty.row][empty.col] = 0;
+            }
+        }
     }
 }
 
