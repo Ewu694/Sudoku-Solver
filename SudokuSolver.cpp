@@ -42,24 +42,20 @@ SudokuSolver::SudokuSolver(std::string input_file)
         arr[i] = new int[9];
     }
     std::string temp_line_reader; //holds the values that will be read from the file
-    if(sudoku_board.is_open())
+    /*if(sudoku_board.is_open())
     {
         for(int row = 0; row = 9; row++)
         {
-            std::getline(sudoku_board, temp_line_reader);
+            getline(sudoku_board, temp_line_reader);
             std::stringstream iss(temp_line_reader);
             for(int col = 0; col = 9; col++)
             {
                 std::string line;
-                std::getline(iss, line, ',');
+                getline(iss, line, ',');
                 std::stringstream board_num(line);//used for stringstream to convert string to int
                 board_num >> arr[row][col];
             }
         }
-    }
-    else
-    {
-        puzzle_solvability_ = false;
     }
     for(int i = 0; i < 9; i++)
     {
@@ -72,6 +68,10 @@ SudokuSolver::SudokuSolver(std::string input_file)
     {
         puzzle_solvability_ = true; 
     }
+    else
+    {
+        puzzle_solvability_ = false;
+    }*/
 }
 
 bool SudokuSolver::isPuzzleSolvable()
@@ -161,7 +161,7 @@ void SudokuSolver::display()
             }
             if(puzzle_numbers_[row][col] == 0)
             {
-                std::cout << "0 ";
+                std::cout << "X ";
             }
             else
             {
