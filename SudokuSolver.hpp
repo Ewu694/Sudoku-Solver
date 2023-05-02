@@ -44,7 +44,7 @@ To find the first empty square you must read the 2D array from top-left (0,0) to
 Set the row and col of the Location to the indices at which the first 0 is found in the 2D array. 
 If there are no empty squares the Location object should have row and col values of -1.
 */
-Sudoku::Location retiurnNextEmpty();
+Sudoku::Location returnNextEmpty();
 
 /*
 checkLegalValue(int value, Sudoku::Location location) returns true if the value parameter (which can take on values 1-9) can legally be placed at the given location in the 2D array without breaking the rules of sudoku. 
@@ -63,19 +63,9 @@ display will print the current board
 void display();
 
 /*
-helper function to check whether a value is presnet in column or not
+Function to solve the sudoku board
 */
-bool IsPresentInCol(int col, int value);
-
-/*
-helper function to check whether a value is present in row or not
-*/
-bool IsPresentInRow(int row, int value);
-
-/*
-helper function to check whether a value is present within a 3x3 sub grid or not
-*/
-bool IsPresentInSubgrid(int subgrid_row, int subgrid_col, int value);
+bool SudokuSolution();
 
 private:
 //Add your private members here
