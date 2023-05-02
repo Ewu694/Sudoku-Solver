@@ -39,20 +39,28 @@ SudokuSolver::SudokuSolver(std::string input_file)
     }
     std::string temp_line_reader; //holds the values that will be read from the file
     int board_num; //used for stringstream to convert string to int
+    Sudoku::Location location;//used to store row/col val
     while(!sudoku_board.eof())
     {
         for(int row = 0; row = 9; row++)
         {
             for(int col = 0; col = 9; col++)
             {
+                location.row = row;
+                location.col = col;
                 getline(sudoku_board, temp_line_reader, ',');
                 std::stringstream int_num_hold;
                 int_num_hold << temp_line_reader;
                 int_num_hold >> board_num;
-                puzzle_numbers_[row][col] = board_num;
+                if(checkLegalValue(board_num, location))
+                {
+                    //puzzle_numbers_[row][col] = board_num;
+                    continue;
+                }
             }
         }
     }
+    puzzle_solvability_ = true; 
 }
 
 bool SudokuSolver::isPuzzleSolvable()
@@ -75,9 +83,11 @@ void SudokuSolver::setPuzzleNumbers(int** puzzle)
     puzzle_numbers_ = puzzle;
 }
 
-Sudoku::Location SudokuSolver::retiurnNextEmpty()
+Sudoku::Location SudokuSolver::returnNextEmpty()
 {
     Sudoku::Location zero_finder;
+    zero_finder.row = -1;
+    zero_finder.col = -1;
     for(int i = 0; i < 9; i++)
     {
         for(int j = 0; j < 9; j++)
@@ -118,14 +128,14 @@ bool SudokuSolver::IsPresentInRow(int row, int value)
 
 bool SudokuSolver::IsPresentInSubgrid(int subgrid_row, int subgrid_col, int value)
 {
-    for(int row = 0; row < 9; row++)
+    for(int row = 0; row < 3; row++)
     {
-        for(int col = 0; col < 9; col++)
+        for(int col = 0; col < 3; col++)
         {
-        if(puzzle_numbers_[row + subgrid_row][col + subgrid_col] == value)
-        {
-            return true;
-        }
+            if(puzzle_numbers_[row + subgrid_row][col + subgrid_col] == value)
+            {
+                return true;
+            }
         }
     }
   return false;
@@ -146,24 +156,45 @@ void SudokuSolver::display()
             {
                 std::cout << " | ";
             }
-            else if(puzzle_numbers_[row][col] == 0)
+            if(puzzle_numbers_[row][col] == 0)
             {
-                std::cout << 0;
+                std::cout << "0 ";
             }
             else
             {
-                std::cout << puzzle_numbers_[row][col];
+            std::cout << puzzle_numbers_[row][col] << " ";
             }
         }
         if(row == 2 || row == 5)
         {
             std::cout << std::endl;
-        }
-        for(int i = 0; i < 9; i++)
-        {
-            std::cout << "- ";
+            for(int i = 0; i < 12; i++)
+            {
+                std::cout << "- ";
+            }
         }
         std::cout << std::endl;
+    }
+}
+
+bool SudokuSolver::SudokuSolution()
+{
+    Sudoku::Location location;
+    if(puzzle_numbers_[returnNextEmpty().row][returnNextEmpty().col] != 0)
+    {
+        return true;//solved because unable to find a empty square
+    }
+    for(int i = 1; i <= 9; i++)
+    {
+        if(checkLegalValue(i, location))
+        {
+            puzzle_numbers_[location.row][location.col] = i;
+        }
+            if(SudokuSolution())
+            {
+                return true;
+            }
+            puzzle_numbers_[location.row][location.col] = 0;
     }
 }
 
