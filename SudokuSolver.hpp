@@ -62,14 +62,9 @@ public:
   void display();
 
 /*
-Helper function for the void function to back track through the entire board and get the right values
+helper function to solve the board
 */
-  bool SudokuSolution(Sudoku::Location location);
-
-/*
-  Function to solve the sudoku board
-*/
-  void SudokuSolution();
+  bool SudokuSolution();
 
 private:
   // Add your private members here
