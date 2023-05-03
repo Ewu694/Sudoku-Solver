@@ -55,6 +55,11 @@ SudokuSolver::SudokuSolver(std::string input_file)
                 }
             }
         }
+        else
+        {
+            puzzle_solvability_ = false;
+        }
+
     SudokuSolution();
 }
 
