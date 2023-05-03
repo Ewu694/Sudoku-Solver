@@ -46,7 +46,7 @@ SudokuSolver::SudokuSolver(std::string input_file)
             {
                 std::getline(sudokuboard,temp_reader);
                 std::stringstream iss(temp_reader);
-                for(int col = 0;col < 9;col++)
+                for(int col = 0; col < 9; col++)
                 {
                     std::string line;
                     std::getline(iss,line,',');
@@ -55,11 +55,6 @@ SudokuSolver::SudokuSolver(std::string input_file)
                 }
             }
         }
-        else
-        {
-            puzzle_solvability_ = false;
-        }
-
     SudokuSolution();
 }
 
@@ -169,66 +164,30 @@ void SudokuSolver::display()
     }
 }
 
-bool SudokuSolver::SudokuSolution(Sudoku::Location location)
+bool SudokuSolver::SudokuSolution()
 {
     Sudoku::Location empty = returnNextEmpty();
-    int row = location.row;
-    int col = location.col;
-    /*
-    if statements used to backtrack
-    */
-    if(row == 9)//when all rows have been done, end
-    {
-        return true;
-    }
-    if(col == 9)//when column is done, move onto next row
-    {
-        location.row++;
-        location.col = 0;
-        return SudokuSolution(location);
-    }
-    if(empty.row == -1 && empty.col == -1)//if board no longer has 0s, end
-    {
-        return true;
-    }
-    if(puzzle_numbers_[row][col] != 0)//backtrack if the current col value isn't a 0 and check next
-    {
-        location.col++;
-        return SudokuSolution(location);
-    }
-    
-    Sudoku::Location board;
-    board.row = row;
-    board.col = col;
-    for(int num = 1; num <= 9; num++)
-    {
-        if(checkLegalValue(num, board))
-        {
-            puzzle_numbers_[row][col] = num;
-            if(SudokuSolution(location))
+    if(empty.row == -1 && empty.col == -1)
+    return true;
+    for(int i = 1; i < 10; i++)
+    {    
+        if(checkLegalValue(i, empty))
+        {        
+            puzzle_numbers_[empty.row][empty.col] = i;
+            if(SudokuSolution())
             {
-                location.col++;
+                puzzle_solvability_ = true;
                 return true;
             }
-            puzzle_numbers_[row][col] = 0;
+            else
+            {
+                puzzle_solvability_ = false;
+                puzzle_numbers_[empty.row][empty.col] = 0;
+            }
         }
     }
+    return false;
 }
 
-void SudokuSolver::SudokuSolution()
-{
-    Sudoku::Location zero;
-    zero.row = 0;
-    zero.col = 0;
-    SudokuSolution(zero);
-     if(SudokuSolution(zero) == true) //if it is solved with the given coordinates,solvable is set a true
-     {
-        puzzle_solvability_ = true;
-     }
-     else
-     {
-        puzzle_solvability_ = false; //otherwise set as false
-     }
-}
 
 
